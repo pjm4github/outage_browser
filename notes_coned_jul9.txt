@@ -1,0 +1,52 @@
+Notes from the meeting on 7/9/2015
+
+CONED says: High priority is to get the customer address of the outage. (The street address)
+Most important thing is the customer address. 
+
+Verizon needs a specific naming convention of the feeder
+ CROWHL  \      CROWHL is all combined (this is the STAR system)
+ CROWHL1  \------ these are the same feeder
+ CROWHL2  /       these are 3 different feeders but these should be searched for the CROWHL feeder
+ CROWHL3 /
+ 
+ Report A CROWHL includes all (customer service address)
+ Report B CROWHL132 is individual 
+
+
+Export time on the report takes too long. We need to eliminate the duplicate lines of the RAW data too. 
+Need to have the address on the exported data file CSV from the reporting tab. 
+
+
+CONED, alongside duration you want a status column that indicates which outage is still happening. 
+The status column should have three columns
+A               B              C            D          E        F       G
+time reported   restored time  duration     status     from     to      system time
+
+status = FAIL or RESTORE
+
+E and F are the begin and end time of the report
+
+If an outage is effect and query the system then the logic for the report is: 
+        A = fail time reported
+        B = blank
+        C = G - A for duration
+        D = FAIL
+        
+If an outage is restored and query the system at or after the restore time, then the logic for the report is: 
+        A = time reported
+        B = restore time reported
+        C = B - A
+        D = RESTORE
+ 
+If the start time of the report is in the middle of the outage?
+     The report should look at ALL the restore times between the start and end and report those.
+     A            B             C            D         E           F        G
+     jul 1 12AM                 2 days       FAIL      jun 30      jul 2    jul 3  12AM
+
+     query on jul 15 over the range of jun 30 jul 11
+     A            B              C           D         E           F         G 
+     jul 1 12AM   jul 10 12 AM   10 days     RESTORE   jun 30      jul 11    jul 15 
+     
+
+     
+    

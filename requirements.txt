@@ -1,0 +1,10 @@
+pika
+sortedcontainers
+pandas
+arrow
+fabric
+requests
+matplotlib
+numpy
+PyQt4
+csv

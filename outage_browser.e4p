@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Project SYSTEM "Project-5.1.dtd">
+<!-- eric project file for project outage_browser -->
+<!-- Saved: 2015-07-08, 14:53:51 -->
+<!-- Copyright (C) 2015 PJM, pmoran@aptect.com -->
+<Project version="5.1">
+  <Language>en_US</Language>
+  <Hash>0865d8fa0eae13f48aee62abb49dabb0bc0f901a</Hash>
+  <ProgLanguage mixed="0">Python2</ProgLanguage>
+  <ProjectType>Qt4</ProjectType>
+  <Description></Description>
+  <Version>0.1</Version>
+  <Author>PJM</Author>
+  <Email>pmoran@aptect.com</Email>
+  <Sources>
+    <Source>main.py</Source>
+    <Source>eon_groomer.py</Source>
+    <Source>eon_groomer_check.py</Source>
+    <Source>fabfile.py</Source>
+    <Source>g_config.py</Source>
+    <Source>g_eon_api_bridge.py</Source>
+    <Source>g_graphics.py</Source>
+    <Source>g_lat_lon_distance.py</Source>
+    <Source>g_main.py</Source>
+    <Source>g_pika_rabbit_bridge.py</Source>
+    <Source>__init__.py</Source>
+    <Source>outage_browser.py</Source>
+    <Source>Ui_outage_browser.py</Source>
+  </Sources>
+  <Forms>
+    <Form>outage_browser.ui</Form>
+  </Forms>
+  <Translations/>
+  <Resources/>
+  <Interfaces/>
+  <Others/>
+  <MainScript>main.py</MainScript>
+  <Vcs>
+    <VcsType>None</VcsType>
+  </Vcs>
+  <FiletypeAssociations>
+    <FiletypeAssociation pattern="*.idl" type="INTERFACES"/>
+    <FiletypeAssociation pattern="*.ptl" type="SOURCES"/>
+    <FiletypeAssociation pattern="*.py" type="SOURCES"/>
+    <FiletypeAssociation pattern="*.py2" type="SOURCES"/>
+    <FiletypeAssociation pattern="*.pyw" type="SOURCES"/>
+    <FiletypeAssociation pattern="*.pyw2" type="SOURCES"/>
+    <FiletypeAssociation pattern="*.qm" type="TRANSLATIONS"/>
+    <FiletypeAssociation pattern="*.qrc" type="RESOURCES"/>
+    <FiletypeAssociation pattern="*.ts" type="TRANSLATIONS"/>
+    <FiletypeAssociation pattern="*.ui" type="FORMS"/>
+  </FiletypeAssociations>
+</Project>

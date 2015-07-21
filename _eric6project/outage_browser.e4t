@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Tasks SYSTEM "Tasks-5.1.dtd">
+<!-- eric6 tasks file for project outage_browser -->
+<!-- Saved: 2015-07-18, 22:16:37 -->
+<Tasks version="5.1">
+  <ProjectScanFilter></ProjectScanFilter>
+  <Task priority="1" completed="False" type="1">
+    <Summary>TODO:</Summary>
+    <Description></Description>
+    <Created>2015-07-08, 14:50:18</Created>
+    <Resource>
+      <Filename>g_main.py</Filename>
+      <Linenumber>214</Linenumber>
+    </Resource>
+  </Task>
+  <Task priority="1" completed="False" type="1">
+    <Summary>TODO: not implemented yet</Summary>
+    <Description></Description>
+    <Created>2015-07-08, 14:53:25</Created>
+    <Resource>
+      <Filename>outage_browser.py</Filename>
+      <Linenumber>31</Linenumber>
+    </Resource>
+  </Task>
+  <Task priority="1" completed="False" type="1">
+    <Summary>TODO: not implemented yet</Summary>
+    <Description></Description>
+    <Created>2015-07-08, 14:53:25</Created>
+    <Resource>
+      <Filename>outage_browser.py</Filename>
+      <Linenumber>38</Linenumber>
+    </Resource>
+  </Task>
+  <Task priority="1" completed="False" type="1">
+    <Summary>TODO: not implemented yet</Summary>
+    <Description></Description>
+    <Created>2015-07-08, 14:53:25</Created>
+    <Resource>
+      <Filename>outage_browser.py</Filename>
+      <Linenumber>46</Linenumber>
+    </Resource>
+  </Task>
+  <Task priority="1" completed="False" type="1">
+    <Summary>TODO: not implemented yet</Summary>
+    <Description></Description>
+    <Created>2015-07-08, 14:53:25</Created>
+    <Resource>
+      <Filename>outage_browser.py</Filename>
+      <Linenumber>54</Linenumber>
+    </Resource>
+  </Task>
+</Tasks>
