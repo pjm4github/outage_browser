@@ -31,7 +31,7 @@ class EonApiBridge:
                         + config.EON_INGESTOR_API_BASE
         self.session = requests.Session()
         self.status = ''
-        self.base_timeout = 45.0
+        self.base_timeout = 90.0  # (Connect timeout, Read timeout)
     ##################################################################
     # ALARMS : PONS-NMS alarm related operations
     ##################################################################
@@ -56,7 +56,10 @@ class EonApiBridge:
             this_api = self.API_BASE + "/alarms" + "?start=" + start_date_time + "&end=" + \
                 end_date_time + "&sort_by=" + sort_by + "&ontSerialNumber=" + \
                 ont_serial_number + "&p=" + ('%d' % p) + "&s=" + ('%d' % s)
-            r = self.session.get(this_api, auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW))
+            r = self.session.get(this_api, headers=self.HEADERS,
+                                 auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW),
+                                 stream=False,
+                                 timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             result = r.content
             dd = json.loads(result)
@@ -66,12 +69,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error(" BRIDGE %s" % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     def alarm_post_pons_nms_01(self, alarm_document=None):
@@ -102,8 +111,8 @@ class EonApiBridge:
         dd = None
         try:
             json_alarm_document = json.dumps(alarm_document)
-            r = self.session.post(this_api, json_alarm_document, headers=self.HEADERS,
-                                  auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW),
+            r = self.session.post(this_api, data=json_alarm_document, headers=self.HEADERS,
+                                  auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW), stream=False,
                                   timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             result = r.content
@@ -114,12 +123,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error(" BRIDGE %s" % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     def alarm_get_pons_nms_by_id_02(self, alarm_id=None):
@@ -135,7 +150,9 @@ class EonApiBridge:
         dd = None
         try:
             this_api = self.API_BASE + "/alarms/"+alarm_id
-            r = self.session.get(this_api, auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW))
+            r = self.session.get(this_api, headers=self.HEADERS,
+                                 auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW), stream=False,
+                                 timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             result = r.content
             dd = json.loads(result)
@@ -145,12 +162,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error(" BRIDGE %s." % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     ##################################################################
@@ -169,7 +192,9 @@ class EonApiBridge:
         try:
             # http://10.123.0.27:8080/eon360/api/groomed-outages?p=0&s=20
             this_api = self.API_BASE + "/company-profiles?p=" + ('%d' % p) + "&s=" + ('%d' % s)
-            r = self.session.get(this_api, auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW))
+            r = self.session.get(this_api, headers=self.HEADERS,
+                                 auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW), stream=False,
+                                 timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             result = r.content
             dd = json.loads(result)
@@ -179,12 +204,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error(" BRIDGE %s." % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     def company_profiles_post(self, company_profile_document=None):
@@ -213,8 +244,8 @@ class EonApiBridge:
         dd = None
         try:
             json_eligibility_entry_document = json.dumps(company_profile_document)
-            r = self.session.post(this_api, json_eligibility_entry_document, headers=self.HEADERS,
-                                  auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW),
+            r = self.session.post(this_api, data=json_eligibility_entry_document, headers=self.HEADERS,
+                                  auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW), stream=False,
                                   timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             if r.status_code > 299:
@@ -228,12 +259,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error(" BRIDGE %s." % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     def company_profiles_get_company_profile_id(self, company_profile_id=''):
@@ -247,7 +284,9 @@ class EonApiBridge:
         this_api = ''
         try:
             this_api = self.API_BASE + "/company-profiles" + company_profile_id
-            r = self.session.get(this_api, auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW))
+            r = self.session.get(this_api, headers=self.HEADERS,
+                                 auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW), stream=False,
+                                 timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             result = r.content
             dd = json.loads(result)
@@ -257,12 +296,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error(" BRIDGE %s." % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     def company_profiles_put_company_profile_id(self, company_profile_id='', company_profile_document=''):
@@ -294,7 +339,8 @@ class EonApiBridge:
             this_api = self.API_BASE + "/company-profiles/" + company_profile_id
             json_company_profile_document = json.dumps(company_profile_document)
             r = self.session.put(this_api, json_company_profile_document, headers=self.HEADERS,
-                                 auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW))
+                                 auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW), stream=False,
+                                 timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             result = r.content
             dd = json.loads(result)
@@ -304,12 +350,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error(" BRIDGE %s" % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     ##################################################################
@@ -333,7 +385,9 @@ class EonApiBridge:
         try:
             this_api = self.API_BASE + "/eligibilities" + "?start=" + start_date_time + "&end=" + \
                 end_date_time + "&p=" + ('%d' % p) + "&s=" + ('%d' % s)
-            r = self.session.get(this_api, auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW))
+            r = self.session.get(this_api, headers=self.HEADERS,
+                                 auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW), stream=False,
+                                 timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             result = r.content
             dd = json.loads(result)
@@ -343,12 +397,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error(" BRIDGE %s." % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     def eligibilities_post_eligibilities(self, eligibility_entry_document=None):
@@ -382,8 +442,8 @@ class EonApiBridge:
         dd = None
         try:
             json_eligibility_entry_document = json.dumps(eligibility_entry_document)
-            r = self.session.post(this_api, json_eligibility_entry_document, headers=self.HEADERS,
-                                  auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW),
+            r = self.session.post(this_api, data=json_eligibility_entry_document, headers=self.HEADERS,
+                                  auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW), stream=False,
                                   timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             if r.status_code > 299:
@@ -397,12 +457,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error(" BRIDGE %s." % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     def eligibilities_get_eligibility_entry_id(self, eligibility_entry_id=None):
@@ -420,7 +486,9 @@ class EonApiBridge:
         this_api = ''
         try:
             this_api = self.API_BASE + "/eligibilities/" + eligibility_entry_id
-            r = self.session.get(this_api, auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW))
+            r = self.session.get(this_api, auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW),
+                                 stream=False,
+                                 timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             result = r.content
             dd = json.loads(result)
@@ -430,12 +498,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error(" BRIDGE %s." % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     def eligibilities_put_eligibility_entry_id(self, eligibility_entry_id=None,  nearby_transformers=None):
@@ -455,12 +529,14 @@ class EonApiBridge:
         #            Update EON Eligibility Model Coefficients
         self.status = 'Normal'
         dd = None
+        r = None
         this_api = ''
         try:
             this_api = self.API_BASE + "/eligibilities/" + eligibility_entry_id + "/nearbyTransformerIds"
             json_nearby_transformers = json.dumps(nearby_transformers)
             r = self.session.put(this_api, json_nearby_transformers, headers=self.HEADERS,
-                                 auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW))
+                                 auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW), stream=False,
+                                 timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             result = r.content
             dd = json.loads(result)
@@ -470,13 +546,19 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error(" BRIDGE %s" % e)
             self.status = 'HTTPError'
-        return dd
+            self.session.close()
+            self.session = requests.Session()
+        return dd, r
 
     def eligibilities_put_eligibility_entry_id_nearby_transformer_id(self, eligibility_entry_id=None,  model_coefficients=None):
         """
@@ -492,7 +574,8 @@ class EonApiBridge:
             this_api = self.API_BASE + "/company-profiles/" + eligibility_entry_id
             json_model_coefficients = json.dumps(model_coefficients)
             r = self.session.put(this_api, json_model_coefficients, headers=self.HEADERS,
-                                 auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW))
+                                 auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW), stream=False,
+                                 timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             result = r.content
             dd = json.loads(result)
@@ -502,12 +585,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error(" BRIDGE %s" % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     ##################################################################
@@ -525,7 +614,9 @@ class EonApiBridge:
         try:
             # http://10.123.0.27:8080/eon360/api/groomed-outages?p=0&s=20
             this_api = self.API_BASE + "/groomed-outages?p=" + ('%d' % p) + "&s=" + ('%d' % s)
-            r = self.session.get(this_api, auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW))
+            r = self.session.get(this_api, headers=self.HEADERS,
+                                 auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW), stream=False,
+                                 timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             result = r.content
             dd = json.loads(result)
@@ -535,12 +626,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error(" BRIDGE %s." % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     def groomed_outages_post_groomed_outages(self, groomed_outage_document=None):
@@ -590,16 +687,16 @@ class EonApiBridge:
         self.status = 'Normal'
         this_api = self.API_BASE + "/groomed-outages"
         dd = None
+        r = None
         try:
             json_groomed_outage_document = json.dumps(groomed_outage_document)
-            r = self.session.post(this_api, json_groomed_outage_document, headers=self.HEADERS,
-                                  auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW),
+            r = self.session.post(this_api, data=json_groomed_outage_document, headers=self.HEADERS,
+                                  auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW), stream=False,
                                   timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
+            result = r.content
             if r.status_code > 299:
                 result = '{"status_code":%d}' % r.status_code
-            else:
-                result = r.content
             dd = json.loads(result)
         except ValueError as e:
             self.my_local_logger.error("BRIDGE %s because %s" % (this_api, e))
@@ -607,13 +704,19 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error(" BRIDGE %s." % e)
             self.status = 'HTTPError'
-        return dd
+            self.session.close()
+            self.session = requests.Session()
+        return dd, r
 
     def groomed_outages_get_groomed_outages_outage_id(self, outage_id=None):
         """
@@ -625,7 +728,9 @@ class EonApiBridge:
         this_api = ''
         try:
             this_api = self.API_BASE + "/groomed-outages/" + outage_id
-            r = self.session.get(this_api, auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW))
+            r = self.session.get(this_api, headers=self.HEADERS,
+                                 auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW), stream=False,
+                                 timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             result = r.content
             dd = json.loads(result)
@@ -635,13 +740,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error(" BRIDGE %s." % e)
             self.status = 'HTTPError'
-
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     def groomed_outages_put_groomed_outages_outage_id(self, outage_id=None, groomed_outage_document=None):
@@ -696,7 +806,8 @@ class EonApiBridge:
         try:
             json_groomed_outage_document = json.dumps(groomed_outage_document)
             r = self.session.put(this_api, json_groomed_outage_document, headers=self.HEADERS,
-                                 auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW))
+                                 auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW), stream=False,
+                                 timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             result = r.content
             dd = json.loads(result)
@@ -706,13 +817,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error("BRIDGE %s" % e)
             self.status = 'HTTPError'
-
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     def groomed_outages_post_groomed_outages_query(self, groomed_outage_query=None, p=0, s=20, sort_by=''):
@@ -754,14 +870,13 @@ class EonApiBridge:
         dd = None
         try:
             json_groomed_outage_query = json.dumps(groomed_outage_query)
-            r = self.session.post(this_api, json_groomed_outage_query, headers=self.HEADERS,
-                                  auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW),
+            r = self.session.post(this_api, data=json_groomed_outage_query, headers=self.HEADERS,
+                                  auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW), stream=False,
                                   timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
+            result = r.content
             if r.status_code > 299:
                 result = '{"status_code":%d}' % r.status_code
-            else:
-                result = r.content
             dd = json.loads(result)
         except ValueError as e:
             self.my_local_logger.error("BRIDGE %s because %s" % (this_api, e))
@@ -769,12 +884,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error(" BRIDGE %s." % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     def groomed_outages_post_groomed_outages_trigger(self, grooming_payload=None):
@@ -803,14 +924,13 @@ class EonApiBridge:
         dd = None
         try:
             json_grooming_payload = json.dumps(grooming_payload)
-            r = self.session.post(this_api, json_grooming_payload, headers=self.HEADERS,
-                                  auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW),
+            r = self.session.post(this_api, data=json_grooming_payload, headers=self.HEADERS,
+                                  auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW), stream=False,
                                   timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
+            result = r.content
             if r.status_code > 299:
                 result = '{"status_code":%d}' % r.status_code
-            else:
-                result = r.content
             dd = json.loads(result)
         except ValueError as e:
             self.my_local_logger.error("BRIDGE %s because %s" % (this_api, e))
@@ -818,12 +938,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error(" BRIDGE %s." % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     ##################################################################
@@ -860,7 +986,9 @@ class EonApiBridge:
                 this_api = self.API_BASE + "/outages" + "?start=" + start_date_time + "&end=" + end_date_time + \
                     "&sort_by=" + sort_by + "&currentOutageOnly=False&company=" + company + \
                     "&p=" + ('%d' % p) + "&s=" + ('%d' % s)
-            r = self.session.get(this_api, auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW))
+            r = self.session.get(this_api, headers=self.HEADERS,
+                                 auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW), stream=False,
+                                 timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             result = r.content
             dd = json.loads(result)
@@ -870,12 +998,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error("BRIDGE %s" % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error("BRIDGE %s %s" % (this_api, e))
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     def outages_post_outages(self, utility_outage_document=None):
@@ -921,8 +1055,8 @@ class EonApiBridge:
         dd = None
         try:
             json_utility_outage_document = json.dumps(utility_outage_document)
-            r = self.session.post(this_api, json_utility_outage_document,  headers=self.HEADERS,
-                                  auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW),
+            r = self.session.post(this_api, data=json_utility_outage_document,  headers=self.HEADERS,
+                                  auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW), stream=False,
                                   timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             if r.status_code != 200:
@@ -936,13 +1070,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error("BRIDGE %s" % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
-
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     def outages_get_outage_outage_id(self, outage_id=None):
@@ -959,7 +1098,9 @@ class EonApiBridge:
         this_api = self.API_BASE + "/outages/" + outage_id
         dd = None
         try:
-            r = self.session.get(this_api, auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW))
+            r = self.session.get(this_api, headers=self.HEADERS,
+                                 auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW), stream=False,
+                                 timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             result = r.content
             dd = json.loads(result)
@@ -969,12 +1110,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error("BRIDGE %s" % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     def outages_put_outage_outage_id(self, outage_id=None, utility_outage_document=None):
@@ -1007,7 +1154,8 @@ class EonApiBridge:
         try:
             json_utility_outage_document = json.dumps(utility_outage_document)
             r = self.session.put(this_api, json_utility_outage_document, headers=self.HEADERS,
-                                 auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW))
+                                 auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW), stream=False,
+                                 timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             result = r.content
             dd = json.loads(result)
@@ -1017,12 +1165,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error("BRIDGE %s" % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     ##################################################################
@@ -1061,8 +1215,8 @@ class EonApiBridge:
                                        (this_api, json_query_parameter))
             # Something weird is happening here
             # time.sleep(0.1)
-            r = self.session.post(this_api, json_query_parameter,  headers=self.HEADERS,
-                                  auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW),
+            r = self.session.post(this_api, data=json_query_parameter,  headers=self.HEADERS,
+                                  auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW), stream=False,
                                   timeout=self.base_timeout)
             # json content is here
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
@@ -1073,12 +1227,18 @@ class EonApiBridge:
             self.status = 'ValueError'
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
+            self.session.close()
+            self.session = requests.Session()
             self.status = 'ConnectionError'
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s, json_query_parameter = %s" % (e, json_query_parameter))
+            self.session.close()
+            self.session = requests.Session()
             self.status = 'Timeout'
         except requests.HTTPError as e:
             self.my_local_logger.error("aborting! %s" % e)
+            self.session.close()
+            self.session = requests.Session()
             self.status = 'HTTPError'
             print "query_post_query failed"
         return dd
@@ -1096,8 +1256,8 @@ class EonApiBridge:
         dd = None
         try:
             json_alarm_ids = json.dumps(alarm_ids)
-            r = self.session.post(this_api, json_alarm_ids, headers=self.HEADERS,
-                                  auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW),
+            r = self.session.post(this_api, data=json_alarm_ids, headers=self.HEADERS,
+                                  auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW), stream=False,
                                   timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             result = r.content
@@ -1108,12 +1268,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error(" BRIDGE %s." % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     def query_post_query_eligibilities(self, box=None, p=0, s=20):
@@ -1134,8 +1300,9 @@ class EonApiBridge:
             this_api = self.API_BASE + "/query/eligibilities?p=" + ('%d' % p) + "&s=" + ('%d' % s)
             try:
                 json_utility_ids = json.dumps(box)
-                r = self.session.post(this_api, json_utility_ids, headers=self.HEADERS,
+                r = self.session.post(this_api, data=json_utility_ids, headers=self.HEADERS,
                                       auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW),
+                                      stream=False,
                                       timeout=self.base_timeout)
                 self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
                 result = r.content
@@ -1146,12 +1313,18 @@ class EonApiBridge:
             except requests.Timeout as e:
                 self.my_local_logger.error("TIMEOUT! %s" % e)
                 self.status = 'Timeout'
+                self.session.close()
+                self.session = requests.Session()
             except requests.ConnectionError as e:
                 self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
                 self.status = 'ConnectionError'
+                self.session.close()
+                self.session = requests.Session()
             except requests.HTTPError as e:
                 self.my_local_logger.error(" BRIDGE %s." % e)
                 self.status = 'HTTPError'
+                self.session.close()
+                self.session = requests.Session()
         return dd
 
     def query_post_query_utilities(self, utility_ids=None):
@@ -1167,8 +1340,9 @@ class EonApiBridge:
         dd = None
         try:
             json_utility_ids = json.dumps(utility_ids)
-            r = self.session.post(this_api, json_utility_ids, headers=self.HEADERS,
+            r = self.session.post(this_api, data=json_utility_ids, headers=self.HEADERS,
                                   auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW),
+                                  stream=False,
                                   timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             result = r.content
@@ -1179,12 +1353,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error(" BRIDGE %s." % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     ##################################################################
@@ -1202,7 +1382,9 @@ class EonApiBridge:
         this_api = ''
         try:
             this_api = self.API_BASE + "/test"
-            r = self.session.get(this_api, auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW))
+            r = self.session.get(this_api, headers=self.HEADERS,
+                                 auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW), stream=False,
+                                 timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             result = r.content
             dd = json.loads(result)
@@ -1212,12 +1394,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error(" BRIDGE %s." % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     ##################################################################
@@ -1241,7 +1429,9 @@ class EonApiBridge:
         try:
             this_api = self.API_BASE + "/tools/outage-region" + "?start=" + start_date_time +\
                 "&end=" + end_date_time + "&company=" + company
-            r = self.session.get(this_api, auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW))
+            r = self.session.get(this_api, headers=self.HEADERS,
+                                 auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW), stream=False,
+                                 timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             result = r.content
             dd = json.loads(result)
@@ -1251,12 +1441,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error(" BRIDGE %s." % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     ##################################################################
@@ -1285,8 +1481,8 @@ class EonApiBridge:
         dd = None
         try:
             json_tweet_document = json.dumps(tweet_document)
-            r = self.session.post(this_api, json_tweet_document, headers=self.HEADERS,
-                                  auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW),
+            r = self.session.post(this_api, data=json_tweet_document, headers=self.HEADERS,
+                                  auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW), stream=False,
                                   timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             result = r.content
@@ -1297,12 +1493,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error(" BRIDGE %s." % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     def tweets_get_tweets(self, start_date_time="", end_date_time="", company="", p=0, s=20):
@@ -1321,7 +1523,9 @@ class EonApiBridge:
         try:
             this_api = self.API_BASE + "/tweets" + "?start=" + start_date_time + "&end=" + end_date_time +\
                 "&company=" + company + "&p=" + ('%d' % p) + "&s=" + ('%d' % s)
-            r = self.session.get(this_api, auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW))
+            r = self.session.get(this_api, auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW),
+                                 stream=False,
+                                 timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             result = r.content
             dd = json.loads(result)
@@ -1331,12 +1535,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.self.my_local_logger.error(" BRIDGE %s." % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     def tweets_get_tweets_tweet_id(self, tweed_id=None):
@@ -1352,7 +1562,9 @@ class EonApiBridge:
         this_api = ''
         try:
             this_api = self.API_BASE + "/tweets/" + tweed_id
-            r = self.session.get(this_api, auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW))
+            r = self.session.get(this_api, auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW),
+                                 stream=False,
+                                 timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             result = r.content
             dd = json.loads(result)
@@ -1362,12 +1574,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error(" BRIDGE %s." % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     ##################################################################
@@ -1419,14 +1637,13 @@ class EonApiBridge:
         dd = None
         try:
             json_utility_document = json.dumps(utility_document)
-            r = self.session.post(this_api, json_utility_document, headers=self.HEADERS,
-                                  auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW),
+            r = self.session.post(this_api, data=json_utility_document, headers=self.HEADERS,
+                                  auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW), stream=False,
                                   timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
+            result = r.content
             if r.status_code > 299:
                 result = '{"status_code":%d}' % r.status_code
-            else:
-                result = r.content
             dd = json.loads(result)
         except ValueError as e:
             self.my_local_logger.error("BRIDGE %s because %s" % (this_api, e))
@@ -1434,12 +1651,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error(" BRIDGE %s." % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     # This might also be referenced as utilities_get_61
@@ -1462,7 +1685,9 @@ class EonApiBridge:
         try:
             this_api = self.API_BASE + "/utilities" + "?start=" + start_date_time + "&end=" + end_date_time +\
                 "&company=" + company + "&p=" + ('%d' % p) + "&s=" + ('%d' % s)
-            r = self.session.get(this_api, auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW))
+            r = self.session.get(this_api, auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW),
+                                 stream=False,
+                                 timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             result = r.content
             dd = json.loads(result)
@@ -1472,12 +1697,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.self.my_local_logger.error(" BRIDGE %s." % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     def utilities_get_utilities_utility_id(self, utility_id=None):
@@ -1494,7 +1725,9 @@ class EonApiBridge:
         this_api = ''
         try:
             this_api = self.API_BASE + "/utilities/" + utility_id
-            r = self.session.get(this_api, auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW))
+            r = self.session.get(this_api, auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW),
+                                 stream=False,
+                                 timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             result = r.content
             dd = json.loads(result)
@@ -1504,12 +1737,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error(" BRIDGE %s." % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     def utilities_post_utilities_utility_id_downstream_downstream_id(self, utility_id=None, down_stream_id=None):
@@ -1528,8 +1767,8 @@ class EonApiBridge:
         this_api = ''
         try:
             this_api = self.API_BASE + "/utilities/" + utility_id + "/downstream/" + down_stream_id
-            r = self.session.post(this_api, "", headers=self.HEADERS,
-                                  auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW),
+            r = self.session.post(this_api, data="", headers=self.HEADERS,
+                                  auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW), stream=False,
                                   timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             result = r.content
@@ -1540,12 +1779,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error(" BRIDGE %s." % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     def utilities_post_utilities_utility_id_eligibilities(self, utility_id=None, eligibility_ids=None):
@@ -1568,8 +1813,8 @@ class EonApiBridge:
         try:
             json_eligibility_ids = json.dumps(eligibility_ids)
             this_api = self.API_BASE + "/utilities/" + utility_id + "/eligibilities"
-            r = self.session.post(this_api, json_eligibility_ids, headers=self.HEADERS,
-                                  auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW),
+            r = self.session.post(this_api, data=json_eligibility_ids, headers=self.HEADERS,
+                                  auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW), stream=False,
                                   timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             result = r.content
@@ -1580,12 +1825,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error(" BRIDGE %s." % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     def utilities_post_utilities_utility_id_upstream_upstream_id(self, utility_id=None, upstream_id=None):
@@ -1603,8 +1854,8 @@ class EonApiBridge:
         this_api = ''
         try:
             this_api = self.API_BASE + "/utilities/" + utility_id + "/upstream/" + upstream_id
-            r = self.session.post(this_api, "", headers=self.HEADERS,
-                                  auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW),
+            r = self.session.post(this_api, data="", headers=self.HEADERS,
+                                  auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW), stream=False,
                                   timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             result = r.content
@@ -1615,12 +1866,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error(" BRIDGE %s." % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     def utilities_get_utilities_circuits_ids(self, company="", search_string=None):
@@ -1638,7 +1895,9 @@ class EonApiBridge:
             if search_string is not None:
                 params += "&%s" % search_string
             this_api = self.API_BASE + "/utilities/circuitIDs" + params
-            r = self.session.get(this_api, auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW))
+            r = self.session.get(this_api,  headers=self.HEADERS,
+                                 auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW), stream=False,
+                                 timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             result = r.content
             dd = json.loads(result)
@@ -1648,12 +1907,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error(" BRIDGE %s." % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     def utilities_get_utilities_circuits_circuit_id(self, circuit_id=None, company="",  p=0, s=20):
@@ -1675,14 +1940,15 @@ class EonApiBridge:
         try:
             this_api = self.API_BASE + "/utilities/circuits/" + circuit_id + "?company=" + company +\
                 "&p=" + ('%d' % p) + "&s=" + ('%d' % s)
-            r = self.session.get(this_api, auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW))
+            r = self.session.get(this_api,  headers=self.HEADERS,
+                                 auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW), stream=False,
+                                 timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             # r = requests.get(call_api, auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW))
             # json content is
+            result = r.content
             if r.status_code > 299:
                 result = '{"status_code":%d}' % r.status_code
-            else:
-                result = r.content
             dd = json.loads(result)
         except ValueError as e:
             self.my_local_logger.error("BRIDGE %s because %s" % (this_api, e))
@@ -1690,12 +1956,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error(" BRIDGE %s." % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     def utilities_get_transformer_ids(self, company="", search_string=None, circuit_id=None):
@@ -1718,7 +1990,9 @@ class EonApiBridge:
                 params += "&%s" % circuit_id
 
             this_api = self.API_BASE + "/utilities/transformerIDs" + params
-            r = self.session.get(this_api, auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW))
+            r = self.session.get(this_api,  headers=self.HEADERS,
+                                 auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW), stream=False,
+                                 timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             result = r.content
             dd = json.loads(result)
@@ -1728,12 +2002,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error(" BRIDGE %s." % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     def utilities_get_transformers_transformer_id(self, transformer_id=None, company="",  p=0, s=20):
@@ -1756,7 +2036,9 @@ class EonApiBridge:
         try:
             this_api = self.API_BASE + "/utilities/transformers/" + transformer_id + "?company=" + company + \
                 "&p=" + ('%d' % p) + "&s=" + ('%d' % s)
-            r = self.session.get(this_api, auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW))
+            r = self.session.get(this_api,  headers=self.HEADERS,
+                                 auth=(config.EON_INGESTOR_UN, config.EON_INGESTOR_PW), stream=False,
+                                 timeout=self.base_timeout)
             self.my_local_logger.debug("Done with API call. Status code = %d" % r.status_code)
             result = r.content
             dd = json.loads(result)
@@ -1766,12 +2048,18 @@ class EonApiBridge:
         except requests.Timeout as e:
             self.my_local_logger.error("TIMEOUT! %s" % e)
             self.status = 'Timeout'
+            self.session.close()
+            self.session = requests.Session()
         except requests.ConnectionError as e:
             self.my_local_logger.error(" BRIDGE %s, service may have been reset!" % e)
             self.status = 'ConnectionError'
+            self.session.close()
+            self.session = requests.Session()
         except requests.HTTPError as e:
             self.my_local_logger.error(" BRIDGE %s." % e)
             self.status = 'HTTPError'
+            self.session.close()
+            self.session = requests.Session()
         return dd
 
     ################################################################

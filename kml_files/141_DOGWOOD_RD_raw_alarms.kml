@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2">
 <Document>
+<Style id="hideLabel">
+    <LabelStyle>
+		<scale>0</scale>
+	</LabelStyle>
+</Style>
   <Placemark>
-   <name>0020F957</name>
+<name>0020F957</name>
  <StyleMap id="msn_green_icon">
             <Pair>
                 <key>normal</key>
-                <styleUrl>#sn_green_icon</styleUrl>
+                <styleUrl>#hideLabel</styleUrl>
             </Pair>
             <Pair>
                 <key>highlight</key>
@@ -52,7 +57,8 @@
 <styleUrl>#msn_green_icon</styleUrl>
   </Placemark>
   <Placemark>
-   <name>0015370D</name>
+   <StyleMap id="hideLabel">
+<name>0015370D</name></StyleMap>
  <StyleMap id="msn_groomed_icon">
             <Pair>
                 <key>normal</key>
