@@ -152,7 +152,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.page_load_label.setText(QString(''))
         self.ont_area_load_label.setText(QString(''))
         job_data_array = str(self.job_data_line_edit.text()).split('\t')
-        if len(job_data_array) < 13:
+        if len(job_data_array) < 12:
             qp = QPalette()
             qp.setColor(QPalette.Base, QColor(255, 120, 120))
             self.job_data_line_edit.setPalette(qp)
@@ -171,8 +171,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                            'LATITUDE': job_data_array[8],
                            'LONGITUDE': job_data_array[9],
                            'DISTANCE': job_data_array[10],
-                           'UNITS': job_data_array[11],
-                           'PLATE': job_data_array[12]}
+                           'UNITS': job_data_array[11]}
 
             self.job_number_line_edit.setText(parsed_dict['JOB_NUMBER'])
             self.export_directory = parsed_dict['JOB_NUMBER']
@@ -233,7 +232,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.feeder_combo_box.setPalette(qp)
                 self.feeder_combo_box.setCurrentIndex(this_index)
             self.lat_lon_line_edit.setText(parsed_dict['LATITUDE'] + ', ' + parsed_dict['LONGITUDE'])
-            self.ms_plate_line_edit.setText(parsed_dict['PLATE'])
+
             # Also load the ont item list
             self.ont_lat_lon_line_edit.setText(parsed_dict['LATITUDE'] + ', ' + parsed_dict['LONGITUDE'])
             self.ont_radius_line_edit.setText(parsed_dict['DISTANCE'])
